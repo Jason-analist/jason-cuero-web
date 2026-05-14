@@ -1,3 +1,4 @@
+import os
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 import httpx
@@ -11,15 +12,16 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+ORS_API_KEY = "tu_api_key_aqui"  # sácala en openrouteservice.org, es gratis
+
 @app.get("/route")
 async def get_route(start_lat: float, start_lon: float, end_lat: float, end_lon: float):
-    url = f"https://api.openrouteservice.org/v2/directions/driving-car"
+    url = "https://api.openrouteservice.org/v2/directions/driving-car"
+    headers = {"Authorization": ORS_API_KEY}
     params = {
         "start": f"{start_lon},{start_lat}",
         "end": f"{end_lon},{end_lat}"
     }
-    headers = {"Authorization": "TU_API_KEY_AQUI"}
-    
     async with httpx.AsyncClient() as client:
-        resp = await client.get(url, params=params, headers=headers)
-        return resp.json()
+        r = await client.get(url, headers=headers, params=params)
+    return r.json()
